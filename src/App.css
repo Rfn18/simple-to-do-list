@@ -1,12 +1,14 @@
 body {
   background-color: #faf9ee;
   color: #64657e;
+  position: relative;
 }
 
 .to-do-list {
   font-family: "Poppins", sans-serif;
   text-align: center;
-  margin-top: 100px;
+  margin: 100px auto 100px auto;
+  max-width: 50%;
 }
 
 h1 {
@@ -93,7 +95,8 @@ ol button {
 .checkbox {
   width: 20px;
   height: 20px;
-  background-color: #64657e;
+  accent-color: #64657e;
+  border: none;
   color: #64657e;
   cursor: pointer;
 }
@@ -173,4 +176,18 @@ option:focus {
   justify-content: center;
   align-items: center;
   gap: 0.5em;
+}
+
+@media screen and (max-width: 767px) {
+  .to-do-list {
+    max-width: 100vh;
+  }
+
+  ol {
+    flex-wrap: wrap;
+  }
+
+  .container-button {
+    gap: 0;
+  }
 }

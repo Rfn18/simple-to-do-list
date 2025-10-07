@@ -1,10 +1,14 @@
-import React, { use, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import "./App.css";
 
 function ToDoList() {
-  const [task, setTask] = useState(["makan", "minum"]);
+  const [task, setTask] = useState([]);
   const [newTask, setNewTask] = useState("");
-  const [bool, setBool] = useState(true);
+  const [bool, setBool] = useState(false);
+  const inputRef = useRef(null)
+  const checkBox = useRef(null)
+  const text = useRef(null)
 
   function handleInputChange(event) {
     setNewTask(event.target.value);
@@ -45,15 +49,46 @@ function ToDoList() {
       setTask(updatedTask);
     }
   }
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (inputRef.current && !inputRef.current.contains(event.target)) {
+          setBool(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
+
+  // const handleCheck = (index) => {
+  //   if (checkBox[index].current.checked) {
+  //     text.current.style.textDecoration = "line-through";
+  //     console.log("true")
+  //   }
+  // }
+
   return (
     <>
       <div className="to-do-list">
         <h1>TODO LIST</h1>
-        {bool === true ? (
-          <div className="task-option-header">
-            <button className="btn-add" onClick={() => setBool(!bool)}>
+            <AnimatePresence mode="wait">
+        {bool == false ? (
+          <motion.div 
+          className="task-option-header"
+          initial={{ opacity: 0, scale: .5}}
+          animate={{ opacity: 1, scale: 1}}
+          exit={{ opacity: 0, scale: 0}}
+          transition={{duration: .2}}>
+            <motion.button 
+            className="btn-add" 
+            onClick={() => setBool(!bool)}
+            key="menu"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}>
               Add Task
-            </button>
+            </motion.button>
             <select name="select" id="select-task" className="select-task">
               <option value="All">All</option>
               {task.map((task, index) => (
@@ -62,47 +97,60 @@ function ToDoList() {
                 </option>
               ))}
             </select>
-          </div>
+          </motion.div>
         ) : (
-          <div className="form">
-            <input
-              type="text"
-              id="input"
-              placeholder="Input New Task.."
-              onChange={handleInputChange}
-            />
-
-            <button className="add-button" onClick={addTask}>
-              Add
-            </button>
-          </div>
+          <motion.div key="form"
+                      initial={{ opacity: 0, scale: .5}}
+                      animate={{ opacity: 1, scale: 1}}
+                      exit={{ opacity: 0, scale: 0}}
+                      transition={{duration: .2}}
+          >
+            <div className="form" ref={inputRef}>
+              <input
+                type="text"
+                id="input"
+                placeholder="Input New Task.."
+                autoFocus
+                onChange={handleInputChange}
+                />
+              <button className="add-button" onClick={addTask}>
+                Add
+              </button>
+            </div>
+          </motion.div>
         )}
+        </AnimatePresence>
+        
         <ol>
           {task.map((task, index) => (
-            <li key={index}>
-              <input type="checkbox" className="checkbox" />
-              <span className="text">{task}</span>
-              <div className="container-button">
-                <button
-                  className="delete-button"
-                  onClick={() => deleteTask(index)}
-                >
-                  <i class="fa-solid fa-trash"></i>
-                </button>
-                <button
-                  className="move-button"
-                  onClick={() => moveTaskUp(index)}
-                >
-                  <i className="fa-solid fa-arrow-up"></i>
-                </button>
-                <button
-                  className="move-button"
-                  onClick={() => moveTaskDown(index)}
-                >
-                  <i className="fa-solid fa-arrow-down"></i>
-                </button>
-              </div>
-            </li>
+            <motion.div initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0 }}>
+              <li key={index}>
+                <input type="checkbox" className="checkbox" ref={checkBox}/>
+                <span className="text" ref={text}>{task}</span>
+                <div className="container-button">
+                  <button
+                    className="delete-button"
+                    onClick={() => deleteTask(index)}
+                    >
+                    <i className="fa-solid fa-trash"></i>
+                  </button>
+                  <button
+                    className="move-button"
+                    onClick={() => moveTaskUp(index)}
+                    >
+                    <i className="fa-solid fa-arrow-up"></i>
+                  </button>
+                  <button
+                    className="move-button"
+                    onClick={() => moveTaskDown(index)}
+                    >
+                    <i className="fa-solid fa-arrow-down"></i>
+                  </button>
+                </div>
+              </li>
+            </motion.div>
           ))}
         </ol>
       </div>
